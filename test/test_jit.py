@@ -11364,6 +11364,21 @@ a")
         y = torch.randn(3, 6)
         self.checkScript(split_two, [(x + y)])
 
+    def test_python_op_name(self):
+        import random
+
+        with self.assertRaisesRegex(RuntimeError, "randint"):
+            @torch.jit.script
+            def fn():
+                return random.randint()
+
+    def test_type_suggestion(self):
+        with self.assertRaisesRegex(RuntimeError, "did you mean ('float')?"):
+            @torch.jit.script
+            def fn(x):
+                # type: (double) -> int
+                return int(2.3)
+
 
 class MnistNet(nn.Module):
     def __init__(self):
